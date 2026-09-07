@@ -1630,8 +1630,8 @@ function rebuildRing(){
        把同色星星合併成一次繪製呼叫,數量再多也能維持流暢 */
     [1,-1].forEach(sign=>{
       const cx = sign*almondOffsetX;
-      const goldCount = Math.round(sparkPerAlmond*0.10);
-      const whiteCount = sparkPerAlmond - goldCount;
+            const goldCount = 0; /* 杏仁形星星統一改為 100% 純白色(#ffffff)，不再混入金色 */
+      const whiteCount = sparkPerAlmond;
       const whiteMesh = new THREE.InstancedMesh(sparkGeo, sparkWhiteMat, whiteCount);
       const goldMesh = new THREE.InstancedMesh(sparkGeo, sparkGoldMat, goldCount);
       const dummy = new THREE.Object3D();
@@ -1646,7 +1646,7 @@ function rebuildRing(){
         const radial = MAIN_RADIUS_MM + halfThick + wave + almondPop + 0.012;
         dummy.position.set(radial*Math.cos(theta), radial*Math.sin(theta), ly);
         dummy.updateMatrix();
-        const isGold = Math.random()<0.10;
+                  const isGold = false; /* 杏仁形星星不再產生金色 */
         if(isGold && gi<goldCount){ goldMesh.setMatrixAt(gi++, dummy.matrix); }
         else if(wi<whiteCount){ whiteMesh.setMatrixAt(wi++, dummy.matrix); }
         else if(gi<goldCount){ goldMesh.setMatrixAt(gi++, dummy.matrix); }
