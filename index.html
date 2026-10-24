@@ -1792,12 +1792,15 @@ function sectionBody(id){
   if(id==='snowdesign'){
     return `
       <p class="opt-desc" style="margin:0 0 4px;">選擇雪花上碎星的排列方式,上方 3D 預覽會即時呈現效果</p>
-      <div class="opt-grid">${SNOWFLAKE_STAR_STYLES.map(s=>`
-        <div class="opt-card ${state.snowStarStyle===s.key?'selected':''}" tabindex="0" role="button"
+      <div class="opt-grid">${SNOWFLAKE_STAR_STYLES.map(s=>{
+        const blocked = (s.key==='diagonal' && state.width<=3);
+        return `
+        <div class="opt-card ${state.snowStarStyle===s.key?'selected':''} ${blocked?'disabled':''}" tabindex="0" role="button"
              onclick="setSnowStarStyle('${s.key}')" onkeydown="if(event.key==='Enter'){setSnowStarStyle('${s.key}')}">
           <p class="opt-name" style="margin:0 0 6px;font-size:15px;">${s.name}</p>
           <p class="opt-desc" style="margin:0;">${s.desc}</p>
-        </div>`).join('')}</div>
+          ${blocked ? `<p class="opt-desc" style="margin:6px 0 0;color:var(--ink-faint);">寬度 3mm 無法施作,請先選擇 4mm 寬度</p>` : ''}
+        </div>`;}).join('')}</div>
     `;
   }
   if(id==='engrave'){
@@ -1977,10 +1980,13 @@ function previewShape(key){
 function setWidth(mm){
   const allowed = SHAPE_ALLOWED_WIDTHS[state.shape] || WIDTHS;
   if(!allowed.includes(mm)) return;
-  state.width = mm; advanceStep('width'); refreshAll();
+  state.width = mm;
+  if(mm<=3 && state.snowStarStyle==='diagonal') state.snowStarStyle = 'parallel'; /* 寬度3mm無法施作斜角碎星,自動改回平行碎星 */
+  advanceStep('width'); refreshAll();
 }
 function setSnowStarStyle(key){
   if(!SNOWFLAKE_STAR_STYLES.some(s=>s.key===key)) return;
+  if(key==='diagonal' && state.width<=3) return; /* 寬度3mm無法施作斜角碎星 */
   state.snowStarStyle = key; advanceStep('snowdesign'); refreshAll();
 }
 function setGemColor(key){ state.gemColor = key; state.gemChosen = true; advanceStep('gem'); refreshAll(); }
